@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import fetch from "isomorphic-unfetch";
 import Link from "next/link";
-import Header from "../../components/Header/Header";
+import Header from "../components/Header/Header";
 import {
   Paper,
   Table,
