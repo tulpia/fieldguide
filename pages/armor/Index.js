@@ -6,12 +6,27 @@ class Armors extends Component {
   constructor(props) {
     super(props)
 
-    console.log(props.skills)
+    let ranks = {}
+    props.armors.forEach(armor => {
+      if (!(armor.rank in ranks)) {
+        console.log(armor.rank)
+        ranks = Object.assign({}, ranks, {[armor.rank]: false})
+      }
+    })
+    // Activer par défaut le High Rank
+    // for (var [rankName, rankValue] in ranks) {
+    //   if (rankName === 'high') {
+    //     rankValue = true
+    //   }
+    // }
 
     this.state = {
       value: '',
+      ranks: ranks,
       armors: props.armors
     }
+
+    console.log(this.state)
   }
 
   filterBySkill(event) {
@@ -42,7 +57,7 @@ class Armors extends Component {
     return (
       <div>
         <h1>MHW Armors</h1>
-        <section className="armors__filter">
+        <section className="armors__filters">
           <select className="filter__skill" onChange={this.filterBySkill.bind(this)} value={this.state.value}>
             <option defaultValue value=''>----------------</option>
             {skills.map(skill => {
@@ -56,6 +71,20 @@ class Armors extends Component {
           {(this.state.value !== '') ? (
             <span> {this.state.armors.length} résultats</span>
           ) : null}
+          <div>
+            <label htmlFor="low">
+              <input type="checkbox" id="low" name="low"/>
+              <span>Low Rank</span>
+            </label>
+            <label htmlFor="high">
+              <input type="checkbox" id="high" name="high" defaultChecked/>
+              <span>High Rank</span>
+            </label>
+            <label htmlFor="master">
+              <input type="checkbox" id="master" name="master"/>
+              <span>Master Rank</span>
+            </label>
+          </div>
         </section>
         <ul className="armors__list">
           {this.state.armors.map(armor => {
@@ -63,12 +92,19 @@ class Armors extends Component {
               <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
                 <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
                   <a>
-                    <span className="armor__id">
-                      [{armor.id}]
-                    </span>
-                    <span className="armor__name">
-                    {armor.name}
-                    </span>
+                    {/* {armor.assets ? (
+                      <div className="armor__img-container">
+                        <img src={armor.assets.imageMale} />
+                      </div>
+                    ) : null } */}
+                    <div className="armor__infos">
+                      <span className="armor__id">
+                        [{armor.id}]
+                      </span>
+                      <span className="armor__name">
+                      {armor.name}
+                      </span>
+                    </div>
                   </a>
                 </Link>
               </li>
@@ -76,11 +112,15 @@ class Armors extends Component {
           })}
         </ul>
         <style jsx>{`
+          .armors__filters {
+            display: flex;
+          }
           ul {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             list-style-type: none;
             gap: 10px;
+            padding: 0;
           }
           li {
             display: block;
@@ -95,7 +135,15 @@ class Armors extends Component {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+          }
+          .armor__img-container {
+            height: 100px;
+            width: 100%;
+          }
+          .armor__img-container img {
+            object-fit: contain;
+            width: 100%; height: 100%;
           }
           .armor__id,
           .armor__name {
