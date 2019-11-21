@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Header from "../components/Header/Header";
+import React, { useState, useEffect } from "react";
+import Header from "../../components/Header/Header";
 import {
   Container,
   Grid,
@@ -8,37 +8,47 @@ import {
   InputLabel,
   Select,
   Card,
-  CardMedia,
   CardContent,
   Typography
 } from "@material-ui/core";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 
+const setLocalStorage = id => {
+  localStorage.setItem("gunType", id);
+};
+
 const Weapons = ({ data, gunTypes }) => {
-  const [gunType, setGuntype] = useState(gunTypes);
-  const [selectedGunType, setSelectedGuntype] = useState(false);
+  const [s_selectedGunType, setSelectedGuntype] = useState(false);
 
   const handeChangeSelect = event => {
     setSelectedGuntype(event.target.value);
+    setLocalStorage(event.target.value);
   };
+
+  // ComponentDidMount dans un component stateless
+  useEffect(() => {
+    if (localStorage.getItem("gunType") && !s_selectedGunType) {
+      setSelectedGuntype(localStorage.getItem("gunType"));
+    }
+  }, []);
 
   return (
     <main>
       <Header name="Liste des armes"></Header>
       <Container maxWidth="lg" style={{ marginTop: "20px" }}>
         <Grid container justify="space-between" spacing={3}>
-          {selectedGunType ? (
+          {s_selectedGunType ? (
             <>
               <Grid item xs={12}>
                 <FormControl style={{ width: "100%" }}>
                   <InputLabel id="demo-simple-select-label">Type</InputLabel>
                   <Select
                     style={{ padding: "0 0 5px 0" }}
-                    value={selectedGunType}
+                    value={s_selectedGunType}
                     onChange={handeChangeSelect}
                   >
-                    {gunType.map((type, index) => {
+                    {gunTypes.map((type, index) => {
                       return (
                         <MenuItem key={index} value={type}>
                           {type}
@@ -49,29 +59,33 @@ const Weapons = ({ data, gunTypes }) => {
                 </FormControl>
               </Grid>
               {data
-                .filter(entry => entry.type === selectedGunType)
+                .filter(entry => entry.type === s_selectedGunType)
                 .map(gun => {
                   return (
-                    <Grid item xs={4} key={gun.id}>
-                      <Card>
-                        <div style={{ height: "250px", width: "100%" }}>
-                          {gun.assets ? (
-                            <img
-                              src={gun.assets.image}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "contain"
-                              }}
-                            />
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                        <CardContent>
-                          <Typography variant="h6">{gun.name}</Typography>
-                        </CardContent>
-                      </Card>
+                    <Grid item xs={12} sm={6} md={3} key={gun.id}>
+                      <Link href="/weapons/[id]" as={`/weapons/${gun.id}`}>
+                        <a>
+                          <Card>
+                            <div style={{ height: "250px", width: "100%" }}>
+                              {gun.assets ? (
+                                <img
+                                  src={gun.assets.image}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "contain"
+                                  }}
+                                />
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                            <CardContent>
+                              <Typography variant="h6">{gun.name}</Typography>
+                            </CardContent>
+                          </Card>
+                        </a>
+                      </Link>
                     </Grid>
                   );
                 })}
@@ -85,7 +99,7 @@ const Weapons = ({ data, gunTypes }) => {
                   value=""
                   onChange={handeChangeSelect}
                 >
-                  {gunType.map((type, index) => {
+                  {gunTypes.map((type, index) => {
                     return (
                       <MenuItem key={index} value={type}>
                         {type}
