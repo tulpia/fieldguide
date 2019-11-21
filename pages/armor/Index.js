@@ -1,16 +1,19 @@
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 // import Header from "../components/Header/Header";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 
 const Armors = ({ skills, armors, ranks }) => {
-  const [s_armors, setArmors] = useState(armors)
-  const [s_value, setValue] = useState('')
+  const [s_skill, setSkill] = useState('')
   const [s_ranks, setRanks] = useState(
     Object.assign({}, ranks, {high: true})
   )
-
-  // console.log(s_ranks)
+  const filteredArmors = useFilterArmor(armors, {
+    skill: s_skill,
+    ranks: s_ranks
+  })
+  console.log(filteredArmors.length)
+  // const filteredArmors = armors
 
   const clickOnRank = event => {
     setRanks(
@@ -18,32 +21,20 @@ const Armors = ({ skills, armors, ranks }) => {
     )
   }
 
-  const filterBySkill = event => {
-    let value = ''
-    let newListOfArmors = armors
-    if (event.target.value !== '') {
-      value = event.target.value
-      newListOfArmors = armors.filter(armor => {
-        let hasArmorConcernedSkill = false
-        if (armor.skills.length > 0) {
-          armor.skills.forEach(skill => {
-            if (parseInt(skill.skill) === parseInt(event.target.value)) {
-              hasArmorConcernedSkill = true
-            }
-          })
-        }
-        return hasArmorConcernedSkill
-      })
-    }
-    setArmors(newListOfArmors)
-    setValue(value)
+  const handleSkillChange = target => {
+    setSkill(target.value)
   }
 
   return(
     <div>
       <h1>MHW Armors</h1>
+      <div>{filteredArmors.length} résultats</div>
       <section className="armors__filters">
-        <select className="filter__skill" onChange={filterBySkill} value={s_value}>
+        <select
+          className="filter__skill"
+          onChange={event => handleSkillChange(event.target)}
+          value={s_skill}
+        >
           <option defaultValue value=''>----------------</option>
           {skills.map(skill => {
             return (
@@ -53,9 +44,6 @@ const Armors = ({ skills, armors, ranks }) => {
             )
           })}
         </select>
-        {(s_value !== '') ? (
-          <span> {armors.length} résultats</span>
-        ) : null}
         <div>
           {Object.keys(s_ranks).map(rank => {
             return(
@@ -74,8 +62,8 @@ const Armors = ({ skills, armors, ranks }) => {
         </div>
       </section>
       <ul className="armors__list">
-        {s_armors.map(armor => {
-          return (
+        {filteredArmors.map(armor => {
+          return(
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
               <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
                 <a>
@@ -95,7 +83,7 @@ const Armors = ({ skills, armors, ranks }) => {
                 </a>
               </Link>
             </li>
-          );
+          )
         })}
       </ul>
       <style jsx>{`
@@ -152,6 +140,34 @@ const Armors = ({ skills, armors, ranks }) => {
       `}</style>
     </div>
   )
+}
+
+function useFilterArmor(armors, filters) {
+  let filteredArmors = armors
+  filteredArmors = filteredArmors.filter(armor => {
+    let hasArmorConcernedSkill = true
+    if (filters.skill !== '') {
+      if (armor.skills.length > 0) {
+        armor.skills.forEach(skill => {
+          if (parseInt(skill.skill) !== parseInt(filters.skill)) {
+            hasArmorConcernedSkill = false
+          }
+        })
+      }
+    }
+
+    let isArmorInCheckedRanks = false
+    Object.keys(filters.ranks).forEach(rank => {
+      if (rank === armor.rank && filters.ranks[rank]) {
+        isArmorInCheckedRanks = true
+      }
+    })
+    
+    if (hasArmorConcernedSkill && isArmorInCheckedRanks) {
+      return true
+    }
+  })
+  return filteredArmors
 }
 
 Armors.getInitialProps = async function() {
