@@ -3,23 +3,28 @@ import React, { Component, useState } from "react";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 
-const Armors = props => {
-  const [armors, setArmors] = useState(props.armors)
-  const [value, setValue] = useState('')
-  const [ranks, setRanks] = useState({})
+const Armors = ({ skills, armors }) => {
+  console.log('armors')
+  console.log(armors)
+  console.log('skills')
+  console.log(skills)
+  console.log('-----------')
+  const [s_armors, setArmors] = useState(armors)
+  const [s_value, setValue] = useState('')
+  const [s_ranks, setRanks] = useState({})
 
   armors.forEach(armor => {
-    if (!(armor.rank in ranks)) {
-      setRanks(Object.assign({}, ranks, {[armor.rank]: false}))
+    if (!(armor.rank in s_ranks)) {
+      setRanks(Object.assign({}, s_ranks, {[armor.rank]: false}))
     }
   })
 
   const filterBySkill = event => {
     let value = ''
-    let newListOfArmors = props.armors
+    let newListOfArmors = armors
     if (event.target.value !== '') {
       value = event.target.value
-      newListOfArmors = props.armors.filter(armor => {
+      newListOfArmors = armors.filter(armor => {
         let hasArmorConcernedSkill = false
         if (armor.skills.length > 0) {
           armor.skills.forEach(skill => {
@@ -39,9 +44,9 @@ const Armors = props => {
     <div>
       <h1>MHW Armors</h1>
       <section className="armors__filters">
-        <select className="filter__skill" onChange={filterBySkill} value={value}>
+        <select className="filter__skill" onChange={filterBySkill} value={s_value}>
           <option defaultValue value=''>----------------</option>
-          {props.skills.map(skill => {
+          {skills.map(skill => {
             return (
               <option key={`skill_${skill.id}`} value={skill.id}>
                 {skill.name}
@@ -49,7 +54,7 @@ const Armors = props => {
             )
           })}
         </select>
-        {(value !== '') ? (
+        {(s_value !== '') ? (
           <span> {armors.length} résultats</span>
         ) : null}
         <div>
