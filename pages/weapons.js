@@ -13,6 +13,7 @@ import {
   Typography
 } from "@material-ui/core";
 import Link from "next/link";
+import fetch from "isomorphic-unfetch";
 
 const Weapons = ({ data, gunTypes }) => {
   const [gunType, setGuntype] = useState(gunTypes);
@@ -54,14 +55,18 @@ const Weapons = ({ data, gunTypes }) => {
                     <Grid item xs={4} key={gun.id}>
                       <Card>
                         <div style={{ height: "250px", width: "100%" }}>
-                          <img
-                            src={gun.assets.image}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "contain"
-                            }}
-                          />
+                          {gun.assets ? (
+                            <img
+                              src={gun.assets.image}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "contain"
+                              }}
+                            />
+                          ) : (
+                            ""
+                          )}
                         </div>
                         <CardContent>
                           <Typography variant="h6">{gun.name}</Typography>
