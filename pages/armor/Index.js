@@ -3,21 +3,20 @@ import React, { Component, useState } from "react";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 
-const Armors = ({ skills, armors }) => {
-  console.log('armors')
-  console.log(armors)
-  console.log('skills')
-  console.log(skills)
-  console.log('-----------')
+const Armors = ({ skills, armors, ranks }) => {
   const [s_armors, setArmors] = useState(armors)
   const [s_value, setValue] = useState('')
-  const [s_ranks, setRanks] = useState({})
+  const [s_ranks, setRanks] = useState(
+    Object.assign({}, ranks, {high: true})
+  )
 
-  armors.forEach(armor => {
-    if (!(armor.rank in s_ranks)) {
-      setRanks(Object.assign({}, s_ranks, {[armor.rank]: false}))
-    }
-  })
+  // console.log(s_ranks)
+
+  const clickOnRank = event => {
+    setRanks(
+      Object.assign({}, s_ranks, {[event.target.name]: event.target.checked})
+    )
+  }
 
   const filterBySkill = event => {
     let value = ''
@@ -58,22 +57,24 @@ const Armors = ({ skills, armors }) => {
           <span> {armors.length} résultats</span>
         ) : null}
         <div>
-          <label htmlFor="low">
-            <input type="checkbox" id="low" name="low"/>
-            <span>Low Rank</span>
-          </label>
-          <label htmlFor="high">
-            <input type="checkbox" id="high" name="high" defaultChecked/>
-            <span>High Rank</span>
-          </label>
-          <label htmlFor="master">
-            <input type="checkbox" id="master" name="master"/>
-            <span>Master Rank</span>
-          </label>
+          {Object.keys(s_ranks).map(rank => {
+            return(
+              <label key={`rank_${rank}`} htmlFor={rank}>
+                <input
+                  type="checkbox"
+                  id={rank}
+                  name={rank}
+                  defaultChecked={s_ranks[rank]}
+                  onChange={clickOnRank}
+                />
+                <span>{rank.charAt(0).toUpperCase()} Rank</span>
+              </label>
+            )
+          })}
         </div>
       </section>
       <ul className="armors__list">
-        {armors.map(armor => {
+        {s_armors.map(armor => {
           return (
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
               <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
@@ -154,14 +155,23 @@ const Armors = ({ skills, armors }) => {
 }
 
 Armors.getInitialProps = async function() {
-  const resArmors = await fetch("https://mhw-db.com/armor");
-  const armors = await resArmors.json();
+// // // // // // // // // // // // // // // // // // // // //
+  const resArmors = await fetch('https://mhw-db.com/armor');
+  const armors = await resArmors.json()
   const resSkills = await fetch('https://mhw-db.com/skills');
-  const skills = await resSkills.json();
-
+  const skills = await resSkills.json()
+// // // // // // // // // // // // // // // // // // // // //
+  let ranks = {}
+  await armors.forEach(armor => {
+    if (!(armor.rank in ranks)) {
+      ranks = Object.assign({}, ranks, {[armor.rank]: false})
+    }
+  })
+// // // // // // // // // // // // // // // // // // // // //
   return {
     armors: armors,
-    skills: skills
+    skills: skills,
+    ranks: ranks
   };
 };
 
