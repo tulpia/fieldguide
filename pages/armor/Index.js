@@ -63,16 +63,19 @@ const Armors = ({ armors, sets, skills, ranks }) => {
         </div>
       </section>
       <ul className="armors__list">
-        {filteredArmors.map(armor => {
+        {filteredArmors.map((armor, index) => {
+          if (index === 0) {
+            console.log(armor)
+          }
           return(
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
               <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
                 <a>
-                  {/* {armor.assets ? (
+                  {armor.assets ? (
                     <div className="armor__img-container">
                       <img src={armor.assets.imageMale} />
                     </div>
-                  ) : null } */}
+                  ) : null }
                   <div className="armor__infos">
                     <span className="armor__id">
                       [{armor.id}]
@@ -80,6 +83,43 @@ const Armors = ({ armors, sets, skills, ranks }) => {
                     <span className="armor__name">
                     {armor.name}
                     </span>
+                    <span className="armor__defense">
+                    base : {armor.defense.base}
+                    max : {armor.defense.max}
+                    augmented : {armor.defense.augmented}
+                    </span>
+                    {armor.resistances ? (
+                      <ul className="armor__resistances">
+                      {Object.keys(armor.resistances).map(res => {
+                      return(
+                        <li>{res} : {armor.resistances[res] ? armor.resistances[res] : '0'}</li>
+                      )
+                      })}
+                      </ul>
+                    ) : null}
+                    {armor.skills ? (
+                      <ul className="armor__skills">
+                      {armor.skills.map(skill => {
+                      return(
+                        <li>
+                          {skill.skillName} {skill.level}
+                        </li>
+                      )
+                      })}
+                      </ul>
+                    ) : null}
+                    {armor.slots.length > 0 ? (
+                      <div>
+                        <span>Empty slots</span>
+                        {armor.slots.map(slot => {
+                          return(
+                            <span>
+                              ({slot.rank})
+                            </span>
+                          )
+                        })}
+                      </div>
+                    ) : null}
                   </div>
                 </a>
               </Link>
@@ -91,19 +131,19 @@ const Armors = ({ armors, sets, skills, ranks }) => {
         .armors__filters {
           display: flex;
         }
-        ul {
+        .armors__list {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
           list-style-type: none;
           gap: 10px;
           padding: 0;
         }
-        li {
+        .armors__list > li {
           display: block;
           grid-column-end: span 1;
         }
-        a {
-          height: 150px;
+        .armors__list > li > a {
+          min-height: 200px;
           padding: 20px;
           text-decoration: none;
           color: black;
