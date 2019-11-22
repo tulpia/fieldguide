@@ -2,18 +2,17 @@ import React, { Component, useState, useEffect } from "react";
 // import Header from "../components/Header/Header";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
+import { capitalize } from '../../utils/utils'
 
 const Armors = ({ skills, armors, ranks }) => {
   const [s_skill, setSkill] = useState('')
   const [s_ranks, setRanks] = useState(
     Object.assign({}, ranks, {high: true})
   )
-  const filteredArmors = useFilterArmor(armors, {
+  const filteredArmors = filterArmors(armors, {
     skill: s_skill,
     ranks: s_ranks
   })
-  console.log(filteredArmors.length)
-  // const filteredArmors = armors
 
   const clickOnRank = event => {
     setRanks(
@@ -55,7 +54,7 @@ const Armors = ({ skills, armors, ranks }) => {
                   defaultChecked={s_ranks[rank]}
                   onChange={clickOnRank}
                 />
-                <span>{rank.charAt(0).toUpperCase()} Rank</span>
+                <span>{capitalize(rank)} Rank</span>
               </label>
             )
           })}
@@ -142,7 +141,7 @@ const Armors = ({ skills, armors, ranks }) => {
   )
 }
 
-function useFilterArmor(armors, filters) {
+function filterArmors(armors, filters) {
   let filteredArmors = armors
   filteredArmors = filteredArmors.filter(armor => {
     let hasArmorConcernedSkill = true
