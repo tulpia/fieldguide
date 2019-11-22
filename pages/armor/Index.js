@@ -14,8 +14,6 @@ const Armors = ({ armors, sets, skills, ranks }) => {
     ranks: s_ranks
   })
 
-  // console.log(sets)
-
   const clickOnRank = event => {
     setRanks(
       Object.assign({}, s_ranks, {[event.target.name]: event.target.checked})
@@ -64,9 +62,6 @@ const Armors = ({ armors, sets, skills, ranks }) => {
       </section>
       <ul className="armors__list">
         {filteredArmors.map((armor, index) => {
-          if (index === 0) {
-            console.log(armor)
-          }
           return(
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
               <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
@@ -228,9 +223,6 @@ Armors.getInitialProps = async function() {
       if (!(armor.armorSet.name in sets)) {
         sets = Object.assign({}, sets, {[armor.armorSet.id]: armor.armorSet})
       }
-    } else {
-      // console.log(armor.id+' : '+armor.name)
-      console.log(armor)
     }
   })
 // // // // // // // // // // // // // // // // // // // // //
