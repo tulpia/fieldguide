@@ -3,6 +3,9 @@ import React, { Component, useState, useEffect } from "react";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 import { capitalize } from '../../utils/utils'
+import Deco1 from '../../assets/deco1.svg'
+import Deco2 from '../../assets/deco2.svg'
+import Deco3 from '../../assets/deco3.svg'
 
 const Armors = ({ armors, sets, skills, ranks }) => {
   const [s_skill, setSkill] = useState('')
@@ -87,7 +90,7 @@ const Armors = ({ armors, sets, skills, ranks }) => {
                       <div className="armor__resistances">
                       {Object.keys(armor.resistances).map(res => {
                       return(
-                        <div className={`armor__res armor__res--${res}`}>{armor.resistances[res] ? armor.resistances[res] : '0'}</div>
+                        <div key={`${armor.id}__${res}--res`} className={`armor__res armor__res--${res}`}>{armor.resistances[res] ? armor.resistances[res] : '0'}</div>
                       )
                       })}
                       </div>
@@ -97,7 +100,8 @@ const Armors = ({ armors, sets, skills, ranks }) => {
                       {armor.skills.map(skill => {
                       return(
                         <div className="armor__skill">
-                          {skill.skillName} {skill.level}
+                          <div className="hexagon"></div>
+                          <div className="skill__name">{skill.skillName} {skill.level}</div>
                         </div>
                       )
                       })}
@@ -110,7 +114,11 @@ const Armors = ({ armors, sets, skills, ranks }) => {
                         {armor.slots.map(slot => {
                           return(
                             <div className="armor__slot">
-                              ({slot.rank})
+                              <div className="slot__svg-container">
+                                {slot.rank === 1 ? <Deco1 /> : null }
+                                {slot.rank === 2 ? <Deco2 /> : null }
+                                {slot.rank === 3 ? <Deco3 /> : null }
+                              </div>
                             </div>
                           )
                         })}
@@ -201,8 +209,43 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           justify-content: center;
         }
         .armor__skill {
+          height: 25px;
           width: 100%;
-
+          display: grid;
+          grid-template-columns: 30px 1fr;
+          gap: 5px;
+        }
+        .skill__name {
+          align-self: center;
+        }
+        .hexagon {
+          width: 20px;
+          height: 11px;
+          background: rgba(0,0,0,0.5);
+          position: relative;
+          align-self: center;
+        }
+        .hexagon:before {
+          content: "";
+          position: absolute;
+          top: -5px;
+          left: 0;
+          width: 0;
+          height: 0;
+          border-left: 10px solid transparent;
+          border-right: 10px solid transparent;
+          border-bottom: 5px solid rgba(0,0,0,0.5);
+        }
+        .hexagon:after {
+          content: "";
+          position: absolute;
+          bottom: -5px;
+          left: 0;
+          width: 0;
+          height: 0;
+          border-left: 10px solid transparent;
+          border-right: 10px solid transparent;
+          border-top: 5px solid rgba(0,0,0,0.5);
         }
         .armor__slots {
           display: flex;
@@ -217,6 +260,13 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           align-items: center;
           padding: 5px;
           border-radius: 5px;
+        }
+        .slot__svg-container {
+          width: 50px;
+          height: 50px;
+        }
+        .slot__svg-container svg {
+          width: 100%;
         }
         .armor__no-skill,
         .armor__no-slot {
@@ -283,7 +333,6 @@ function filterArmors(armors, filters) {
       return true
     }
   })
-  console.log(filteredArmors)
   return filteredArmors
 }
 
