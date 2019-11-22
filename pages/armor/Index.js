@@ -4,7 +4,7 @@ import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 import { capitalize } from '../../utils/utils'
 
-const Armors = ({ skills, armors, ranks }) => {
+const Armors = ({ armors, sets, skills, ranks }) => {
   const [s_skill, setSkill] = useState('')
   const [s_ranks, setRanks] = useState(
     Object.assign({}, ranks, {high: true})
@@ -13,6 +13,8 @@ const Armors = ({ skills, armors, ranks }) => {
     skill: s_skill,
     ranks: s_ranks
   })
+
+  // console.log(sets)
 
   const clickOnRank = event => {
     setRanks(
@@ -91,7 +93,7 @@ const Armors = ({ skills, armors, ranks }) => {
         }
         ul {
           display: grid;
-          grid-template-columns: repeat(10, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           list-style-type: none;
           gap: 10px;
           padding: 0;
@@ -177,16 +179,26 @@ Armors.getInitialProps = async function() {
   const skills = await resSkills.json()
 // // // // // // // // // // // // // // // // // // // // //
   let ranks = {}
-  await armors.forEach(armor => {
+  let sets = {}
+  await armors.forEach((armor, index) => {
     if (!(armor.rank in ranks)) {
       ranks = Object.assign({}, ranks, {[armor.rank]: false})
+    }
+    if (armor.armorSet) {
+      if (!(armor.armorSet.name in sets)) {
+        sets = Object.assign({}, sets, {[armor.armorSet.id]: armor.armorSet})
+      }
+    } else {
+      // console.log(armor.id+' : '+armor.name)
+      console.log(armor)
     }
   })
 // // // // // // // // // // // // // // // // // // // // //
   return {
     armors: armors,
+    sets: sets,
     skills: skills,
-    ranks: ranks
+    ranks: ranks,
   };
 };
 
