@@ -66,11 +66,11 @@ const Armors = ({ armors, sets, skills, ranks }) => {
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
               <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
                 <a>
+                  <div className="armor__img-container">
                   {armor.assets ? (
-                    <div className="armor__img-container">
-                      <img src={armor.assets.imageMale} />
-                    </div>
+                    <img src={armor.assets.imageMale} />
                   ) : null }
+                  </div>
                   <div className="armor__infos">
                     <span className="armor__id">
                       [{armor.id}]
@@ -78,43 +78,46 @@ const Armors = ({ armors, sets, skills, ranks }) => {
                     <span className="armor__name">
                     {armor.name}
                     </span>
-                    <span className="armor__defense">
-                    base : {armor.defense.base}
-                    max : {armor.defense.max}
-                    augmented : {armor.defense.augmented}
-                    </span>
+                    <div className="armor__defenses">
+                      <div>base<br/>{armor.defense.base}</div>
+                      <div>maxi<br/>{armor.defense.max}</div>
+                      <div>augm<br/>{armor.defense.augmented}</div>
+                    </div>
                     {armor.resistances ? (
-                      <ul className="armor__resistances">
+                      <div className="armor__resistances">
                       {Object.keys(armor.resistances).map(res => {
                       return(
-                        <li>{res} : {armor.resistances[res] ? armor.resistances[res] : '0'}</li>
+                        <div className={`armor__res armor__res--${res}`}>{armor.resistances[res] ? armor.resistances[res] : '0'}</div>
                       )
                       })}
-                      </ul>
+                      </div>
                     ) : null}
-                    {armor.skills ? (
-                      <ul className="armor__skills">
+                    {armor.skills.length > 0 ? (
+                      <div className="armor__skills">
                       {armor.skills.map(skill => {
                       return(
-                        <li>
+                        <div className="armor__skill">
                           {skill.skillName} {skill.level}
-                        </li>
+                        </div>
                       )
                       })}
-                      </ul>
-                    ) : null}
+                      </div>
+                    ) : (
+                      <div className="armor__no-skill">No Skill</div>
+                    )}
                     {armor.slots.length > 0 ? (
-                      <div>
-                        <span>Empty slots</span>
+                      <div className="armor__slots">
                         {armor.slots.map(slot => {
                           return(
-                            <span>
+                            <div className="armor__slot">
                               ({slot.rank})
-                            </span>
+                            </div>
                           )
                         })}
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="armor__no-slot">No slots</div>
+                    )}
                   </div>
                 </a>
               </Link>
@@ -156,6 +159,12 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           object-fit: contain;
           width: 100%; height: 100%;
         }
+        .armor__infos {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: 25px 75px 50px 30px 100px 50px;
+          gap: 10px;
+        }
         .armor__id,
         .armor__name {
           display: block;
@@ -164,14 +173,83 @@ const Armors = ({ armors, sets, skills, ranks }) => {
         .armor__id {
           margin-bottom: 10px;
         }
+        .armor__name {
+          display: flex;
+          align-items: center;
+        }
+        .armor__defenses {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          text-align: center;
+        }
+        .armor__resistances {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          color: white;
+          font-weight: bold;
+        }
+        .armor__res {
+          padding: 5px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .armor__skills {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .armor__skill {
+          width: 100%;
+
+        }
+        .armor__slots {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .armor__slot {
+          color: white;
+          background-color: grey;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 5px;
+          border-radius: 5px;
+        }
+        .armor__no-skill,
+        .armor__no-slot {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          opacity: 0.25;
+          padding: 10px;
+          font-weight: bold;
+        }
+        .armor__res--fire {
+          background-color: red;
+        }
+        .armor__res--water {
+          background-color: blue;
+        }
+        .armor__res--ice {
+          background-color: lightblue;
+        }
+        .armor__res--thunder {
+          background-color: yellow;
+        }
+        .armor__res--dragon {
+          background-color: purple;
+        }
         .armor--low {
-          background-color: #ffdbc5;
+          background-color: rgb(100%, 85.9%, 77.3%, 0.5);
         }
         .armor--high {
-          background-color: #ff9d76;
+          background-color: rgb(100%, 61.6%, 46.3%, 0.5);
         }
         .armor--master {
-          background-color: #ef4339;
+          background-color: rgb(93.7%, 26.3%, 22.4%, 0.5);
         }
       `}</style>
     </div>
@@ -181,15 +259,17 @@ const Armors = ({ armors, sets, skills, ranks }) => {
 function filterArmors(armors, filters) {
   let filteredArmors = armors
   filteredArmors = filteredArmors.filter(armor => {
-    let hasArmorConcernedSkill = true
+    let hasArmorConcernedSkill = false
     if (filters.skill !== '') {
       if (armor.skills.length > 0) {
         armor.skills.forEach(skill => {
-          if (parseInt(skill.skill) !== parseInt(filters.skill)) {
-            hasArmorConcernedSkill = false
+          if (parseInt(skill.skill) === parseInt(filters.skill)) {
+            hasArmorConcernedSkill = true
           }
         })
       }
+    } else {
+      hasArmorConcernedSkill = true
     }
 
     let isArmorInCheckedRanks = false
@@ -203,6 +283,7 @@ function filterArmors(armors, filters) {
       return true
     }
   })
+  console.log(filteredArmors)
   return filteredArmors
 }
 
