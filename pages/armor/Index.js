@@ -81,7 +81,7 @@ const Armors = ({ armors, sets, skills, ranks }) => {
             {(!checkIfSetLoaded(loadedSet, armor) && armor.armorSet) ? (
               <div key={`set--${armor.armorSet.id}`} className="armor__set">{sets[armor.armorSet.id].name}</div>
             ) : null }
-            <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
+            <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.type} armor--${armor.rank}`}>
               <div className="armor__img-container">
               {armor.assets ? (
                 <img src={armor.assets.imageMale} />
@@ -169,8 +169,27 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           align-items: center;
           justify-content: space-between;
         }
+        .armor--head {
+          grid-column-start: 1;
+        }
+        .armor--chest {
+          grid-column-start: 2
+        }
+        .armor--gloves {
+          grid-column-start: 3
+        }
+        .armor--waist {
+          grid-column-start: 4
+        }
+        .armor--legs {
+          grid-column-start: 5
+        }
         .armors__list > .armor__set {
           grid-column-end: span 5;
+          padding: 10px;
+          background-color: black;
+          color: white;
+          font-weight: bold;
         }
         .armor__img-container {
           position: absolute;
