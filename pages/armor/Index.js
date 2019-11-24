@@ -1,5 +1,4 @@
-import React, { Component, useState, useEffect } from "react";
-// import Header from "../components/Header/Header";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 import { capitalize } from '../../utils/utils'
@@ -25,6 +24,18 @@ const Armors = ({ armors, sets, skills, ranks }) => {
 
   const handleSkillChange = target => {
     setSkill(target.value)
+  }
+
+  let loadedSet = []
+  const checkIfSetLoaded = (loadedSet, armor) => {
+    if (armor.armorSet) {
+      if (loadedSet.includes(armor.armorSet.id)) {
+        return true
+      } else {
+        loadedSet.push(armor.armorSet.id)
+        return false
+      }
+    }
   }
 
   return(
@@ -66,70 +77,71 @@ const Armors = ({ armors, sets, skills, ranks }) => {
       <ul className="armors__list">
         {filteredArmors.map((armor, index) => {
           return(
+            <>
+            {(!checkIfSetLoaded(loadedSet, armor) && armor.armorSet) ? (
+              <div key={`set--${armor.armorSet.id}`} className="armor__set">{sets[armor.armorSet.id].name}</div>
+            ) : null }
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.rank}`}>
-              <Link href="/armor/[id]" as={`/armor/${armor.id}`}>
-                <a>
-                  <div className="armor__img-container">
-                  {armor.assets ? (
-                    <img src={armor.assets.imageMale} />
-                  ) : null }
-                  </div>
-                  <div className="armor__infos">
-                    <span className="armor__id">
-                      [{armor.id}]
-                    </span>
-                    <span className="armor__name">
-                    {armor.name}
-                    </span>
-                    <div className="armor__defenses">
-                      <div>base<br/>{armor.defense.base}</div>
-                      <div>maxi<br/>{armor.defense.max}</div>
-                      <div>augm<br/>{armor.defense.augmented}</div>
+              <div className="armor__img-container">
+              {armor.assets ? (
+                <img src={armor.assets.imageMale} />
+              ) : null }
+              </div>
+              <div className="armor__infos">
+                <div className="armor__name">
+                  <span className="armor__id">
+                    [{armor.id}]
+                  </span>
+                  {armor.name}
+                </div>
+                <div className="armor__defenses">
+                  <div>base<br/>{armor.defense.base}</div>
+                  <div>maxi<br/>{armor.defense.max}</div>
+                  <div>augm<br/>{armor.defense.augmented}</div>
+                </div>
+                {armor.skills.length > 0 ? (
+                  <div className="armor__skills">
+                  {armor.skills.map(skill => {
+                  return(
+                    <div className="armor__skill">
+                      <div className="hexagon"></div>
+                      <div className="skill__name">{skill.skillName} {skill.level}</div>
                     </div>
-                    {armor.resistances ? (
-                      <div className="armor__resistances">
-                      {Object.keys(armor.resistances).map(res => {
+                  )
+                  })}
+                  </div>
+                ) : (
+                  <div className="armor__no-skill">No Skill</div>
+                )}
+                {armor.slots.length > 0 ? (
+                  <div className="armor__slots">
+                    {armor.slots.map(slot => {
                       return(
-                        <div key={`${armor.id}__${res}--res`} className={`armor__res armor__res--${res}`}>{armor.resistances[res] ? armor.resistances[res] : '0'}</div>
-                      )
-                      })}
-                      </div>
-                    ) : null}
-                    {armor.skills.length > 0 ? (
-                      <div className="armor__skills">
-                      {armor.skills.map(skill => {
-                      return(
-                        <div className="armor__skill">
-                          <div className="hexagon"></div>
-                          <div className="skill__name">{skill.skillName} {skill.level}</div>
+                        <div className="armor__slot">
+                          <div className="slot__svg-container">
+                            {slot.rank === 1 ? <Deco1 /> : null }
+                            {slot.rank === 2 ? <Deco2 /> : null }
+                            {slot.rank === 3 ? <Deco3 /> : null }
+                          </div>
                         </div>
                       )
-                      })}
-                      </div>
-                    ) : (
-                      <div className="armor__no-skill">No Skill</div>
-                    )}
-                    {armor.slots.length > 0 ? (
-                      <div className="armor__slots">
-                        {armor.slots.map(slot => {
-                          return(
-                            <div className="armor__slot">
-                              <div className="slot__svg-container">
-                                {slot.rank === 1 ? <Deco1 /> : null }
-                                {slot.rank === 2 ? <Deco2 /> : null }
-                                {slot.rank === 3 ? <Deco3 /> : null }
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    ) : (
-                      <div className="armor__no-slot">No slots</div>
-                    )}
+                    })}
                   </div>
-                </a>
-              </Link>
+                ) : (
+                  <div className="armor__no-slot">No slots</div>
+                )}
+                {armor.resistances ? (
+                  <div className="armor__resistances">
+                  {Object.keys(armor.resistances).map(res => {
+                  return(
+                    <div key={`${armor.id}__${res}--res`} className={`armor__res armor__res--${res}`}>{armor.resistances[res] ? armor.resistances[res] : '0'}</div>
+                  )
+                  })}
+                  </div>
+                ) : null}
+              </div>
             </li>
+            </>
           )
         })}
       </ul>
@@ -145,12 +157,10 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           padding: 0;
         }
         .armors__list > li {
+          position: relative;
           display: block;
           grid-column-end: span 1;
-        }
-        .armors__list > li > a {
           min-height: 200px;
-          padding: 20px;
           text-decoration: none;
           color: black;
           font-family: arial;
@@ -159,31 +169,39 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           align-items: center;
           justify-content: space-between;
         }
+        .armors__list > .armor__set {
+          grid-column-end: span 5;
+        }
         .armor__img-container {
-          height: 100px;
+          position: absolute;
+          height: 150px;
           width: 100%;
+          z-index: 0;
+          opacity: 0.25;
+          display: flex;
+          align-items: center;
+          pointer-events: none;
         }
         .armor__img-container img {
-          object-fit: contain;
+          object-fit: cover;
           width: 100%; height: 100%;
         }
         .armor__infos {
           display: grid;
+          width: 100%;
           grid-template-columns: 1fr;
-          grid-template-rows: 25px 75px 50px 30px 100px 50px;
+          grid-template-rows: 75px 50px 30px 50px 50px;
           gap: 10px;
-        }
-        .armor__id,
-        .armor__name {
-          display: block;
-          text-align: center;
-        }
-        .armor__id {
-          margin-bottom: 10px;
         }
         .armor__name {
           display: flex;
           align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+        .armor__name .armor__id {
+          display: inline-block;
+          margin-right: 5px;
         }
         .armor__defenses {
           display: grid;
@@ -194,7 +212,7 @@ const Armors = ({ armors, sets, skills, ranks }) => {
         .armor__resistances {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          color: white;
+          color: black;
           font-weight: bold;
         }
         .armor__res {
@@ -254,12 +272,10 @@ const Armors = ({ armors, sets, skills, ranks }) => {
         }
         .armor__slot {
           color: white;
-          background-color: grey;
           display: flex;
           justify-content: center;
           align-items: center;
           padding: 5px;
-          border-radius: 5px;
         }
         .slot__svg-container {
           width: 50px;
@@ -278,19 +294,19 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           font-weight: bold;
         }
         .armor__res--fire {
-          background-color: red;
+          background-color: rgba(255,0,0,0.25);
         }
         .armor__res--water {
-          background-color: blue;
+          background-color: rgba(0,0,255,0.25);
         }
         .armor__res--ice {
-          background-color: lightblue;
+          background-color: rgba(100, 100, 255, 0.25);
         }
         .armor__res--thunder {
-          background-color: yellow;
+          background-color: rgba(255, 255, 0, 0.25);
         }
         .armor__res--dragon {
-          background-color: purple;
+          background-color: rgba(150, 0, 150, 0.25);
         }
         .armor--low {
           background-color: rgb(100%, 85.9%, 77.3%, 0.5);
