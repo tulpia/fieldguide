@@ -39,8 +39,15 @@ const Armors = ({ armors, sets, skills, ranks }) => {
   }
 
   return(
-    <div>
+    <div className="armors__container">
       <h1>MHW Armors</h1>
+      <div className="armors__guide">
+        <div>Head</div>
+        <div>Chest</div>
+        <div>Gloves</div>
+        <div>Waist</div>
+        <div>Legs</div>
+      </div>
       <div>{filteredArmors.length} résultats</div>
       <section className="armors__filters">
         <select
@@ -146,6 +153,21 @@ const Armors = ({ armors, sets, skills, ranks }) => {
         })}
       </ul>
       <style jsx>{`
+        .armors__container {
+          position: relative;
+        }
+        .armors__guide {
+          position: fixed;
+          top: 0;
+          padding: 10px 0;
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 10px;
+          width: calc(100% - 16px);
+          text-align: center;
+          background-color: rgba(255,255,255,0.25);
+          z-index: 2;
+        }
         .armors__filters {
           display: flex;
         }
