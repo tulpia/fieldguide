@@ -2,9 +2,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 import { capitalize } from '../../utils/utils'
+
+import "./armors.scss"
+
 import Deco1 from '../../assets/deco1.svg'
 import Deco2 from '../../assets/deco2.svg'
 import Deco3 from '../../assets/deco3.svg'
+import Star from '../../assets/star.svg'
 
 const Armors = ({ armors, sets, skills, ranks }) => {
   const [s_skill, setSkill] = useState('')
@@ -86,7 +90,10 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           return(
             <>
             {(!checkIfSetLoaded(loadedSet, armor) && armor.armorSet) ? (
-              <div key={`set--${armor.armorSet.id}`} className="armor__set">{sets[armor.armorSet.id].name}</div>
+              <div key={`set--${armor.armorSet.id}`} className="armor__set">
+                {sets[armor.armorSet.id].name}
+                <Star />
+              </div>
             ) : null }
             <li key={`armor_${armor.id}`} className={`list__armor armor--${armor.type} armor--${armor.rank}`}>
               <div className="armor__img-container">
@@ -152,213 +159,6 @@ const Armors = ({ armors, sets, skills, ranks }) => {
           )
         })}
       </ul>
-      <style jsx>{`
-        .armors__container {
-          position: relative;
-        }
-        .armors__guide {
-          position: fixed;
-          top: 0;
-          padding: 10px 0;
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 10px;
-          width: calc(100% - 16px);
-          text-align: center;
-          background-color: rgba(255,255,255,0.25);
-          z-index: 2;
-        }
-        .armors__filters {
-          display: flex;
-        }
-        .armors__list {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          list-style-type: none;
-          gap: 10px;
-          padding: 0;
-        }
-        .armors__list > li {
-          position: relative;
-          display: block;
-          grid-column-end: span 1;
-          min-height: 200px;
-          text-decoration: none;
-          color: black;
-          font-family: arial;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .armor--head {
-          grid-column-start: 1;
-        }
-        .armor--chest {
-          grid-column-start: 2
-        }
-        .armor--gloves {
-          grid-column-start: 3
-        }
-        .armor--waist {
-          grid-column-start: 4
-        }
-        .armor--legs {
-          grid-column-start: 5
-        }
-        .armors__list > .armor__set {
-          grid-column-end: span 5;
-          padding: 10px;
-          background-color: black;
-          color: white;
-          font-weight: bold;
-        }
-        .armor__img-container {
-          position: absolute;
-          height: 150px;
-          width: 100%;
-          z-index: 0;
-          opacity: 0.25;
-          display: flex;
-          align-items: center;
-          pointer-events: none;
-        }
-        .armor__img-container img {
-          object-fit: cover;
-          width: 100%; height: 100%;
-        }
-        .armor__infos {
-          display: grid;
-          width: 100%;
-          grid-template-columns: 1fr;
-          grid-template-rows: 75px 50px 30px 50px 50px;
-          gap: 10px;
-        }
-        .armor__name {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-        }
-        .armor__name .armor__id {
-          display: inline-block;
-          margin-right: 5px;
-        }
-        .armor__defenses {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
-          text-align: center;
-        }
-        .armor__resistances {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          color: black;
-          font-weight: bold;
-        }
-        .armor__res {
-          padding: 5px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .armor__skills {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-        .armor__skill {
-          height: 25px;
-          width: 100%;
-          display: grid;
-          grid-template-columns: 30px 1fr;
-          gap: 5px;
-        }
-        .skill__name {
-          align-self: center;
-        }
-        .hexagon {
-          width: 20px;
-          height: 11px;
-          background: rgba(0,0,0,0.5);
-          position: relative;
-          align-self: center;
-        }
-        .hexagon:before {
-          content: "";
-          position: absolute;
-          top: -5px;
-          left: 0;
-          width: 0;
-          height: 0;
-          border-left: 10px solid transparent;
-          border-right: 10px solid transparent;
-          border-bottom: 5px solid rgba(0,0,0,0.5);
-        }
-        .hexagon:after {
-          content: "";
-          position: absolute;
-          bottom: -5px;
-          left: 0;
-          width: 0;
-          height: 0;
-          border-left: 10px solid transparent;
-          border-right: 10px solid transparent;
-          border-top: 5px solid rgba(0,0,0,0.5);
-        }
-        .armor__slots {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .armor__slot {
-          color: white;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 5px;
-        }
-        .slot__svg-container {
-          width: 50px;
-          height: 50px;
-        }
-        .slot__svg-container svg {
-          width: 100%;
-        }
-        .armor__no-skill,
-        .armor__no-slot {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          opacity: 0.25;
-          padding: 10px;
-          font-weight: bold;
-        }
-        .armor__res--fire {
-          background-color: rgba(255,0,0,0.25);
-        }
-        .armor__res--water {
-          background-color: rgba(0,0,255,0.25);
-        }
-        .armor__res--ice {
-          background-color: rgba(100, 100, 255, 0.25);
-        }
-        .armor__res--thunder {
-          background-color: rgba(255, 255, 0, 0.25);
-        }
-        .armor__res--dragon {
-          background-color: rgba(150, 0, 150, 0.25);
-        }
-        .armor--low {
-          background-color: rgb(100%, 85.9%, 77.3%, 0.5);
-        }
-        .armor--high {
-          background-color: rgb(100%, 61.6%, 46.3%, 0.5);
-        }
-        .armor--master {
-          background-color: rgb(93.7%, 26.3%, 22.4%, 0.5);
-        }
-      `}</style>
     </div>
   )
 }
