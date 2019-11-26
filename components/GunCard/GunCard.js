@@ -3,6 +3,17 @@ import { Grid, Card, CardContent, Typography, Paper } from "@material-ui/core";
 import Link from "next/link";
 
 const GunCard = ({ data }) => {
+  let width = 0;
+  let durability;
+
+  if (data.durability && data.durability[0]) {
+    durability = data.durability[0];
+
+    Object.keys(durability).map(entry => {
+      width += durability[entry];
+    });
+  }
+
   return (
     <Grid item xs={12} sm={6} md={3}>
       <Link href="/weapons/[id]" as={`/weapons/${data.id}`}>
@@ -43,40 +54,31 @@ const GunCard = ({ data }) => {
                 <Typography>Elementless</Typography>
               )}
               <Typography style={{ marginTop: "20Px" }}>
-                Base durability (no handicraft applied)
+                Base durability (no handicraft)
               </Typography>
-              <Paper>
-                <article
-                  style={{ width: "100%", height: "35px", display: "flex" }}
-                >
-                  {data.durability.map(entry => {
-                    let width = 0;
-                    const values = [];
+              {durability ? (
+                <Paper style={{ marginTop: "5px" }}>
+                  <article
+                    style={{ width: "100%", height: "35px", display: "flex" }}
+                  >
+                    {Object.keys(durability).map((entry, index) => {
+                      const singleWidth = (durability[entry] * width) / 100;
 
-                    Object.keys(entry).map(key => {
-                      width = width + entry[key];
-                      values.push({ [key]: entry[key] });
-                    });
-
-                    if (values && values.length > 1) {
-                      values.map(value => {
-                        Object.keys(value).map(entry => {
-                          const singleWidth = (value[entry] * 100) / width;
-
-                          return (
-                            <div
-                              style={{
-                                width: `${singleWidth}%`,
-                                backgroundColor: entry
-                              }}
-                            ></div>
-                          );
-                        });
-                      });
-                    }
-                  })}
-                </article>
-              </Paper>
+                      return (
+                        <div
+                          key={index}
+                          style={{
+                            width: `${singleWidth}%`,
+                            backgroundColor: entry
+                          }}
+                        ></div>
+                      );
+                    })}
+                  </article>
+                </Paper>
+              ) : (
+                ""
+              )}
             </CardContent>
           </Card>
         </a>
