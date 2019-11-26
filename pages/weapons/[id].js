@@ -6,7 +6,7 @@ const Item = props => {
 
 Item.getInitialProps = async function(context) {
   const { id } = context.query;
-  const request = await fetch(`https://mhw-db.com/items?q={"id":${id}}`);
+  const request = await fetch(`https://mhw-db.com/weapons?q={"id":${id}}`);
   const data = await request.json();
 
   console.log(data);
