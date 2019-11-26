@@ -3,16 +3,14 @@ import Header from "../../components/Header/Header";
 import {
   Container,
   Grid,
-  FormControl,
-  MenuItem,
-  InputLabel,
   Select,
-  Card,
-  CardContent,
-  Typography
+  MenuItem,
+  FormControl,
+  InputLabel
 } from "@material-ui/core";
-import Link from "next/link";
 import fetch from "isomorphic-unfetch";
+import GunCard from "../../components/GunCard/GunCard";
+import SelectGunTypes from "../../components/SelectGunTypes/SelectGunTypes";
 
 const setLocalStorage = id => {
   localStorage.setItem("gunType", id);
@@ -21,7 +19,7 @@ const setLocalStorage = id => {
 const Weapons = ({ data, gunTypes }) => {
   const [s_selectedGunType, setSelectedGuntype] = useState(false);
 
-  const handeChangeSelect = event => {
+  const handleChangeSelect = event => {
     setSelectedGuntype(event.target.value);
     setLocalStorage(event.target.value);
   };
@@ -37,80 +35,34 @@ const Weapons = ({ data, gunTypes }) => {
     <main>
       <Header name="Liste des armes"></Header>
       <Container maxWidth="lg" style={{ marginTop: "20px" }}>
-        <Grid container justify="space-between" spacing={3}>
-          {s_selectedGunType ? (
-            <>
-              <Grid item xs={12}>
-                <FormControl style={{ width: "100%" }}>
-                  <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                  <Select
-                    style={{ padding: "0 0 5px 0" }}
-                    value={s_selectedGunType}
-                    onChange={handeChangeSelect}
-                  >
-                    {gunTypes.map((type, index) => {
-                      return (
-                        <MenuItem key={index} value={type}>
-                          {type}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
+        {s_selectedGunType ? (
+          <>
+            <SelectGunTypes
+              selectValue={s_selectedGunType}
+              selectOnChange={handleChangeSelect}
+              gunTypes={gunTypes}
+            />
+            <Grid
+              container
+              justify="space-between"
+              spacing={3}
+              style={{ marginTop: "50px" }}
+            >
+              <Grid item xs={12}></Grid>
               {data
                 .filter(entry => entry.type === s_selectedGunType)
                 .map(gun => {
-                  return (
-                    <Grid item xs={12} sm={6} md={3} key={gun.id}>
-                      <Link href="/weapons/[id]" as={`/weapons/${gun.id}`}>
-                        <a>
-                          <Card>
-                            <div style={{ height: "250px", width: "100%" }}>
-                              {gun.assets ? (
-                                <img
-                                  src={gun.assets.image}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "contain"
-                                  }}
-                                />
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                            <CardContent>
-                              <Typography variant="h6">{gun.name}</Typography>
-                            </CardContent>
-                          </Card>
-                        </a>
-                      </Link>
-                    </Grid>
-                  );
+                  return <GunCard data={gun} key={gun.id} />;
                 })}
-            </>
-          ) : (
-            <Grid item xs={12}>
-              <FormControl style={{ width: "100%" }}>
-                <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                <Select
-                  style={{ padding: "0 0 5px 0" }}
-                  value=""
-                  onChange={handeChangeSelect}
-                >
-                  {gunTypes.map((type, index) => {
-                    return (
-                      <MenuItem key={index} value={type}>
-                        {type}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
             </Grid>
-          )}
-        </Grid>
+          </>
+        ) : (
+          <SelectGunTypes
+            selectValue=""
+            selectOnChange={handleChangeSelect}
+            gunTypes={gunTypes}
+          />
+        )}
       </Container>
     </main>
   );
